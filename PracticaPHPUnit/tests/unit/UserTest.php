@@ -7,10 +7,30 @@ use PHPUnit\Framework\TestCase;
 
 class UserTest extends TestCase
 {
-    public function testUserIsAnAdultReturnsFalseForMinors(): void
+    public function testIsAnAdultReturnsFalseForMinors(): void
     {
-        $user = new User(16);
-        $this->assertEquals(false, $user->isAnAdult());
+        $user = new User(17);
+        $this->assertFalse($user->isAnAdult());
+
+        $user = new User(6);
+
+        $this->assertFalse($user->isAnAdult());
+    }
+
+    public function testIsAnAdultReturnsTrueForOlderThanTresshold(){
+        $user = new User(19);
+        $this->assertTrue($user->isAnAdult());
+
+        $user = new User(80);
+        $this->assertTrue($user->isAnAdult());
+
+        $user = new User(102);
+        $this->assertTrue($user->isAnAdult());
+    }
+
+    public function testIsAnAdultReturnsTrueForTresshold(){
+        $user = new User(18);
+        $this->assertTrue($user->isAnAdult());
     }
 }
 
