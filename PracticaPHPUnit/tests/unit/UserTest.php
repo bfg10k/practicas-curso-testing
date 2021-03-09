@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class UserTest extends TestCase
 {
 
-    private const THRESHOLD = 18;
+    private const LEGAL_AGE_FOR_DRIVING = 18;
     public function testIsAnAdultReturnsFalseForMinors(): void
     {
         $user = new User(17);
@@ -31,7 +31,7 @@ class UserTest extends TestCase
     }
 
     public function testIsAnAdultReturnsTrueForTresshold(){
-        $user = new User(self::THRESHOLD);
+        $user = new User(self::LEGAL_AGE_FOR_DRIVING);
         $this->assertTrue($user->isAnAdult());
     }
 }
