@@ -5,5 +5,11 @@
     "require": {},
     "require-dev": {
         "phpunit/phpunit": "^9"
+    },
+    "autoload": {
+        "psr-4": {
+            "": "src/",
+            "Test\\Unit\\": "tests/unit"
+        }
     }
 }
