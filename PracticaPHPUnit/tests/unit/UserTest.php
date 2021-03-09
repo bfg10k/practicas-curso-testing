@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class UserTest extends TestCase
 {
     private const LEGAL_AGE_FOR_DRIVING = 18;
-    private const MINIMUN_AGE_FOR_PASSENGERS= 6;
+    private const MINIMUN_AGE_FOR_PASSENGERS = 6;
 
     public function testIsAnAdultReturnsFalseForMinors(): void
     {
@@ -20,7 +20,8 @@ class UserTest extends TestCase
         $this->assertFalse($user->isAnAdult());
     }
 
-    public function testIsAnAdultReturnsTrueForOlderThanTresshold(){
+    public function testIsAnAdultReturnsTrueForOlderThanTresshold()
+    {
         $user = new User(19);
         $this->assertTrue($user->isAnAdult());
 
@@ -31,17 +32,33 @@ class UserTest extends TestCase
         $this->assertTrue($user->isAnAdult());
     }
 
-    public function testIsAnAdultReturnsTrueForTresshold(){
+    public function testIsAnAdultReturnsTrueForTresshold()
+    {
         $user = new User(self::LEGAL_AGE_FOR_DRIVING);
         $this->assertTrue($user->isAnAdult());
     }
 
-    public function testPassengersUnderMinimumAgeCantBeCreated(){
-        try{
-            new User(self::MINIMUN_AGE_FOR_PASSENGERS - 1);
-        }catch (\Exception $e){
-            $this->assertEquals(\InvalidArgumentException::class, get_class($e) );
-        }
+    public function testPassengersUnderMinimumAgeCantBeCreated()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new User(self::MINIMUN_AGE_FOR_PASSENGERS - 1);
+    }
+
+    public function testUsersOverMinimumAgeCanBeCreated()
+    {
+        $this->assertEquals(
+            User::class,
+            get_class(new User(self::MINIMUN_AGE_FOR_PASSENGERS + 1))
+        );
+    }
+
+    public function testUsersOfMinimumAgeCanBeCreated()
+    {
+        $this->assertEquals(
+            User::class,
+            get_class(new User(self::MINIMUN_AGE_FOR_PASSENGERS))
+        );
     }
 }
 
