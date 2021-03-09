@@ -1,0 +1,8 @@
+{
+    "name": "curso-testing/dia-1",
+    "type": "project",
+    "require": {},
+    "autoload": {
+        "files": ["src/Operations.php", "tests/unit/SumTest.php"]
+    }
+}
