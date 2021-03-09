@@ -50,3 +50,5 @@
 
 # Embedded web-server pid file
 /.web-server-pid
+
+PracticaPHPUnit/.phpunit.result.cache
