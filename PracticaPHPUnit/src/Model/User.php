@@ -9,7 +9,7 @@ class User {
         $this->age = $age;
     }
 
-    public function isAnAdult() {
-        return $this->age = 18;
+    public function isAnAdult(): bool {
+        return $this->age >= 18;
     }
 }
