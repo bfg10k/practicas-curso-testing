@@ -1,0 +1,9 @@
+{
+    "name": "curso-testing/practica-php-unit",
+    "description": "Proyecto de prueba para iniciar el contacto con PHPUnit",
+    "type": "project",
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^9"
+    }
+}
