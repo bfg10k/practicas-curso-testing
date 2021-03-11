@@ -14,7 +14,7 @@ class User
 
     private string $password;
 
-    public function __construct(string $name, string $mail, string $password, int $age)
+    public function __construct(string $name, int $age, string $mail, string $password)
     {
         if ($age < 6) {
             throw new \InvalidArgumentException();
