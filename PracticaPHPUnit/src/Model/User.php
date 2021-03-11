@@ -14,13 +14,12 @@ class User
 
     private string $password;
 
-    public function __construct(int $id, string $name, string $mail, string $password, int $age)
+    public function __construct(string $name, string $mail, string $password, int $age)
     {
         if ($age < 6) {
             throw new \InvalidArgumentException();
         }
 
-        $this->id = $id;
         $this->name = $name;
         $this->age = $age;
         $this->mail = $mail;
@@ -30,5 +29,51 @@ class User
     public function isAnAdult(): bool
     {
         return $this->age >= 18;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAge(): int
+    {
+        return $this->age;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMail(): string
+    {
+        return $this->mail;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setId(int $id)
+    {
+        $this->id = $id;
+        return $this;
     }
 }
