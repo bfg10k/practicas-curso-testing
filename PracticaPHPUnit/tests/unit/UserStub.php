@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Test\Unit;
-
 
 use Model\User;
 
@@ -15,5 +13,10 @@ class UserStub extends User
             $age,
             '',
             '');
+    }
+
+    public static function empty()
+    {
+        return new User('', 6, '', '');
     }
 }
