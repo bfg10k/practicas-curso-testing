@@ -6,15 +6,14 @@ namespace Test\Unit;
 
 use Model\User;
 
-class FakeUser
+class UserStub extends User
 {
-    public static function allEmptyButAge(int $age): User
+    public function __construct(int $age)
     {
-        return new User(
+        parent::__construct(
             '',
             $age,
             '',
-            ''
-        );
+            '');
     }
 }
