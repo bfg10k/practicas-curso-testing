@@ -52,3 +52,5 @@
 /.web-server-pid
 
 PracticaPHPUnit/.phpunit.result.cache
+
+PracticaPHPUnit/.idea/
