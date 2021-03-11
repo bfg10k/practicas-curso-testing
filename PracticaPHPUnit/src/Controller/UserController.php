@@ -13,7 +13,9 @@ class UserController
         $user = $this->getUser();
 
         $conn = $this->createConnection("127.0.0.1", "db_user", "db_pass", "rental_db");
-
+        if (!$conn->connect_error) {
+            $this->handleFailOnCreateConnection();
+        }
         $sql = "INSERT INTO users (firstname, age, mail, password)
          VALUES ('" . $user->getName() . "', '" . $user->getAge() . "', '" . $user->getMail() . "', '" . $user->getPassword() . "')";
 
@@ -26,13 +28,9 @@ class UserController
         }
     }
 
-    protected function createConnection(string $host, string $user, string $password, string $db): \mysqli
+    protected function createConnection(string $host, string $user, string $password, string $db)
     {
-        $conn = new \mysqli($host, $user, $password, $db);
-        if (!$conn->connect_error) {
-            $this->handleFailOnCreateConnection();
-        }
-        return $conn;
+        return new \mysqli($host, $user, $password, $db);
     }
 
     protected function getUser(): User
