@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 
 namespace Controller;
@@ -10,41 +10,67 @@ class UserController
 {
     public function register()
     {
-        $user = new User(
-            $_POST['name'],
-            $_POST['age'],
-            $_POST['mail'],
-            $_POST['password'],
-        );
+        $user = $this->getUser();
 
-        $conn = new \mysqli("127.0.0.1", "db_user", "db_pass", "rental_db");
-        if (!$conn->connect_error) {
-            echo json_encode(
-                ["error" => "Error inesperado"]
-            );
-        }
+        $conn = $this->createConnection("127.0.0.1", "db_user", "db_pass", "rental_db");
 
         $sql = "INSERT INTO users (firstname, age, mail, password)
          VALUES ('" . $user->getName() . "', '" . $user->getAge() . "', '" . $user->getMail() . "', '" . $user->getPassword() . "')";
 
         if ($conn->query($sql) === true) {
             $conn->close();
-            echo json_encode(
-                ["user" =>
-                    [
-                        "id" => $user->getId(),
-                        "name" => $user->getName(),
-                        "age" => $user->getAge(),
-                        "mail" => $user->getMail(),
-                        "password" => $user->getPassword(),
-                    ]
-                ]
-            );
+            $this->sendResponse($user);
         } else {
             $conn->close();
-            throw new \Exception();
+            $this->handleFailOnInsert();
         }
+    }
 
+    protected function createConnection(string $host, string $user, string $password, string $db): \mysqli
+    {
+        $conn = new \mysqli($host, $user, $password, $db);
+        if (!$conn->connect_error) {
+            $this->handleFailOnCreateConnection();
+        }
+        return $conn;
+    }
 
+    protected function getUser(): User
+    {
+        return new User(
+            $_POST['name'],
+            $_POST['age'],
+            $_POST['mail'],
+            $_POST['password'],
+        );
+    }
+
+    protected function sendResponse(User $user): void
+    {
+        echo json_encode(
+            ["user" =>
+                [
+                    "id" => $user->getId(),
+                    "name" => $user->getName(),
+                    "age" => $user->getAge(),
+                    "mail" => $user->getMail(),
+                    "password" => $user->getPassword(),
+                ]
+            ]
+        );
+    }
+
+    protected function handleFailOnInsert(): void
+    {
+        echo json_encode(
+            ["error" => "Algo ha fallado al guardar los datos."]
+        );
+    }
+
+    protected function handleFailOnCreateConnection(): void
+    {
+        echo json_encode(
+            ["error" => "Error inesperado."]
+        );
     }
 }
