@@ -2,8 +2,12 @@
 
 namespace Model;
 
-class User
-{
+class User {
+
+    private const LEGAL_AGE_FOR_DRIVING=18; 
+    
+    private const MINIMUM_USER_AGE=6; 
+
     private int $id;
 
     private string $name;
@@ -14,9 +18,8 @@ class User
 
     private string $password;
 
-    public function __construct(string $name, int $age, string $mail, string $password)
-    {
-        if ($age < 6) {
+    public function __construct(string $name, int $age, string $mail, string $password){
+        if($age < self::MINIMUM_USER_AGE){
             throw new \InvalidArgumentException();
         }
 
@@ -26,9 +29,8 @@ class User
         $this->password = $password;
     }
 
-    public function isAnAdult(): bool
-    {
-        return $this->age >= 18;
+    public function isAnAdult(): bool{
+        return $this->age >= self::LEGAL_AGE_FOR_DRIVING;
     }
 
     /**
@@ -77,3 +79,6 @@ class User
         return $this;
     }
 }
+
+
+

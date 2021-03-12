@@ -7,30 +7,25 @@ use Model\User;
 
 class UserControllerFailConnectionTestClass extends UserController
 {
-    private bool $conectionFailed;
+    private bool $conectionFailed = false;
 
-
-    public function checkConectionFailed()
-    {
-        return $this->conectionFailed;
-    }
-
-    protected function createConnection(string $host, string $user, string $password, string $db)
-    {
-        $fakeConnection = (new \stdClass());
-        $fakeConnection->connect_error = true;
-        var_dump($fakeConnection);
-        return $fakeConnection;
-    }
-    public function handleFailOnCreateConnection(): string
+    protected function handleFailOnCreateConnection(): string
     {
         $this->conectionFailed = true;
-
         return '';
+    }
+
+    public function checkConectionFailed(){
+        return $this->conectionFailed;
     }
 
     protected function getUser(): User
     {
-        return UserStub::empty();
+        return new UserStub(6);
+    }
+
+    protected function createConnection(string $host, string $user, string $password, string $db)
+    {
+        return new DbConnectionFailMock();
     }
 }

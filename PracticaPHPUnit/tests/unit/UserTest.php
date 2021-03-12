@@ -1,64 +1,61 @@
-<?php declare(strict_types=1);
+<?php 
 
 namespace Test\Unit;
 
-use Test\Unit\UserStub as User;
 use PHPUnit\Framework\TestCase;
+use Test\Unit\UserStub as User;
 
 class UserTest extends TestCase
 {
     private const LEGAL_AGE_FOR_DRIVING = 18;
-    private const MINIMUN_AGE_FOR_PASSENGERS = 6;
+    
+    private const MINIMUM_USER_AGE=6; 
 
-    public function testIsAnAdultReturnsFalseForMinors(): void
-    {
-        $user = new User(17);
+    public function testUserIsAnAdultReturnsFalseForMinors(){
+        $user = new User(self::LEGAL_AGE_FOR_DRIVING - 1);
+        
         $this->assertFalse($user->isAnAdult());
 
         $user = new User(6);
-
+        
         $this->assertFalse($user->isAnAdult());
     }
 
-    public function testIsAnAdultReturnsTrueForOlderThanTresshold()
-    {
-        $user = new User(19);
+    public function testIsAnAdultReturnsTrueForPeopleOlderThanThreshold(){
+        $user = new User(self::LEGAL_AGE_FOR_DRIVING + 1);
+        
         $this->assertTrue($user->isAnAdult());
 
-        $user = new User(80);
+        $user = new User(55);
+        
         $this->assertTrue($user->isAnAdult());
 
         $user = new User(102);
+        
         $this->assertTrue($user->isAnAdult());
     }
 
-    public function testIsAnAdultReturnsTrueForTresshold()
-    {
+    public function testIsAnAdultReturnsTrueForTresshold(){
         $user = new User(self::LEGAL_AGE_FOR_DRIVING);
         $this->assertTrue($user->isAnAdult());
     }
 
-    public function testPassengersUnderMinimumAgeCantBeCreated()
-    {
+    public function testPassengerUnderMinimumAgeCantBeCreated(){
         $this->expectException(\InvalidArgumentException::class);
-
-        new User(self::MINIMUN_AGE_FOR_PASSENGERS - 1);
+        new User(self::MINIMUM_USER_AGE-1);
     }
 
-    public function testUsersOverMinimumAgeCanBeCreated()
-    {
-        $this->assertEquals(
-            User::class,
-            get_class(new User(self::MINIMUN_AGE_FOR_PASSENGERS + 1))
-        );
+    public function testPassengerOverMinimumAgeCanBeCreated(){
+        $this->assertTrue((new User(self::MINIMUM_USER_AGE+1)) instanceof User);
+
+        $this->assertTrue((new User(self::MINIMUM_USER_AGE+20)) instanceof User);
+
+        $this->assertTrue((new User(self::MINIMUM_USER_AGE+80)) instanceof User);
     }
 
-    public function testUsersOfMinimumAgeCanBeCreated()
-    {
-        $this->assertEquals(
-            User::class,
-            get_class(new User(self::MINIMUN_AGE_FOR_PASSENGERS))
+    public function testUsersOfMinimumAgeCanBeCreated(){
+        $this->assertTrue(
+            (new User(self::MINIMUM_USER_AGE)) instanceof User
         );
     }
 }
-

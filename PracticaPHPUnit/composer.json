@@ -1,11 +1,9 @@
 {
-    "name": "curso-testing/practica-php-unit",
-    "description": "Proyecto de prueba para iniciar el contacto con PHPUnit",
-    "type": "project",
-    "require": {},
+    "name": "curso/practica-php-unit",
     "require-dev": {
         "phpunit/phpunit": "^9"
     },
+    "require": {},
     "autoload": {
         "psr-4": {
             "": "src/",
