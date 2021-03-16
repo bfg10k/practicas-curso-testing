@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Unit;
+namespace Test\Unit\UserController;
 
 use PHPUnit\Framework\TestCase;
 use Service\NonValidConnectionException;

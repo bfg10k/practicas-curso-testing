@@ -1,6 +1,6 @@
 <?php 
 
-namespace Test\Unit;
+namespace Test\Unit\User;
 
 use PHPUnit\Framework\TestCase;
 use Test\Unit\UserStub as User;

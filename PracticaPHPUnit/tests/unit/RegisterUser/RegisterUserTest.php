@@ -1,6 +1,6 @@
 <?php /** @noinspection PhpUnhandledExceptionInspection */
 
-namespace Test\Unit;
+namespace Test\Unit\RegisterUser;
 
 
 use Model\User;
