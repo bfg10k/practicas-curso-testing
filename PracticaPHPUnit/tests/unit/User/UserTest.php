@@ -3,7 +3,7 @@
 namespace Test\Unit\User;
 
 use PHPUnit\Framework\TestCase;
-use Test\Unit\UserStub as User;
+use Test\Unit\Common\Doubles\UserStub as User;
 
 class UserTest extends TestCase
 {

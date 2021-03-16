@@ -4,6 +4,7 @@ namespace Test\Unit\UserController;
 
 use Controller\UserController;
 use Model\User;
+use Test\Unit\Common\Doubles\UserStub;
 
 class UserControllerFailConnectionTestClass extends UserController
 {
