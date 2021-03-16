@@ -1,20 +1,16 @@
 <?php
-namespace Test\Unit;
+namespace Test\Unit\UserController;
 
 use Service\DbConnection;
 use Service\NonValidConnectionException;
 
-class DbConnectionInsertionMock extends DbConnection {
+class DbConnectionFailMock extends DbConnection {
 
     public function __construct(){
-    }
-
-    public function insert(string $sql): int{
-        return rand(1,1000);
+        throw new NonValidConnectionException();
     }
 
     public function close(): void{
-
     }
 
 }

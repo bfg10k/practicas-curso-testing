@@ -1,11 +1,11 @@
 <?php /** @noinspection PhpUnhandledExceptionInspection */
 
-namespace Test\Unit;
-
+namespace Test\Unit\RegisterUser;
 
 use Model\User;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Test\Unit\Common\Doubles\UserStub;
 use UseCase\RegisterUser;
 
 class RegisterUserTest extends TestCase
