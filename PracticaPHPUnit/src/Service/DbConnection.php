@@ -3,9 +3,7 @@
 namespace Service;
 
 class DbConnection {
-
     private string $conn;
-
 
     /**
      * @throws NonValidConnectionException
@@ -13,7 +11,7 @@ class DbConnection {
     public function __construct(string $host, string $dbUser, string $dbPass, string $dbName){
         $this->conn = new \mysqli($host, $dbUser, $dbPass, $dbName);
 
-        if ($conn->connect_error) {
+        if ($this->conn->connect_error) {
             throw new NonValidConnectionException();
         }
     }
