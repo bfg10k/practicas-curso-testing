@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Test\Unit;
+namespace Test\Unit\UserController;
 
 use Controller\UserController;
 use Model\User;

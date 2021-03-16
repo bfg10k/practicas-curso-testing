@@ -1,8 +1,6 @@
 <?php
 
-
-namespace Test\Unit;
-
+namespace Test\Unit\UserController;
 
 use Controller\UserController;
 

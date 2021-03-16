@@ -1,20 +1,20 @@
 <?php
-namespace Test\Unit;
+namespace Test\Unit\RegisterUser;
 
 use Service\DbConnection;
-use UseCase\UserPersistanceException;
+use Service\NonValidConnectionException;
 
-class DbConnectionInsertFailMock extends DbConnection {
+class DbConnectionInsertionMock extends DbConnection {
 
     public function __construct(){
-
     }
 
     public function insert(string $sql): int{
-        throw new UserPersistanceException();
+        return rand(1,1000);
     }
 
     public function close(): void{
+
     }
 
 }
