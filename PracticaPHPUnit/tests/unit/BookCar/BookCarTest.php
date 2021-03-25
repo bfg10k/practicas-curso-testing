@@ -108,4 +108,34 @@ class BookCarTest extends TestCase
         );
     }
 
+    /**
+     * @test
+     */
+    public function minorsCannotBookAvailableCars()
+    {
+        $this->expectException(MinorsCannotBookCarsException::class);
+
+        $dbConnectionDummy = $this->createStub(DbConnection::class);
+        $carFinderStub = $this->createStub(CarFinder::class);
+        $userStub = $this->createStub(User::class);
+        $carStub = $this->createStub(Car::class);
+
+        $userStub->method('isAnAdult')
+            ->willReturn(false);
+
+        $carStub->method('isAvailable')
+            ->willReturn(true);
+
+        $carFinderStub->method('find')
+            ->willReturn(
+                $carStub
+            );
+
+        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionDummy);
+
+        $bookCarUseCase->execute(
+            $userStub,
+            1
+        );
+    }
 }
