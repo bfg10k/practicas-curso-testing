@@ -7,6 +7,7 @@ use Service\CarFinder;
 use Model\User;
 use Model\Car;
 use Model\Booking;
+use Service\InsertException;
 
 class BookCar {
 
@@ -18,18 +19,27 @@ class BookCar {
         $this->dbConnection = $dbConnection;
     }
 
-    public function execute(User $user, int $carId){        
+    /**
+     * @throws CarNotAvailableException|InsertException|MinorsCannotBookCarsException
+     */
+    public function execute(User $user, int $carId): Booking
+    {
         $car = $this->carFinder->find($carId);
-        
-        if(!$car->isAvailable()){
-            throw new \Exception();
-        }
-        
-        $booking = $this->bookCar($user, $car);
 
-        return $booking;
+        if(!$car->isAvailable()){
+            throw new CarNotAvailableException();
+        }
+
+        if(!$user->isAnAdult()){
+            throw new MinorsCannotBookCarsException();
+        }
+
+        return $this->bookCar($user, $car);
     }
 
+    /**
+     * @throws InsertException
+     */
     private function bookCar(User $user, Car $car): Booking {
         $bookingId = $this->dbConnection->insert(
             'INSERT INTO bookings (userId, carId) VALUES('.$user->getId().', '.
