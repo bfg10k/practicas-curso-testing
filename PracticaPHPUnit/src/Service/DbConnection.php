@@ -2,16 +2,17 @@
 
 namespace Service;
 
-class DbConnection {
+use mysqli;
 
-    private string $conn;
+class DbConnection {
+    private mysqli $conn;
 
 
     /**
      * @throws NonValidConnectionException
      */
-    public function __construct(string $host, string $dbUser, string $dbPass, string $dbName){
-        $this->conn = new \mysqli($host, $dbUser, $dbPass, $dbName);
+    public function __construct(string $host, string $dbUser, string $dbPass, string $dbName) {
+        $this->conn = new mysqli($host, $dbUser, $dbPass, $dbName);
 
         if ($conn->connect_error) {
             throw new NonValidConnectionException();
@@ -32,7 +33,7 @@ class DbConnection {
         return $this->conn->insert_id;
     }
 
-    public function close(){
+    public function close(): void{
         $this->conn->close();
     }
 }
