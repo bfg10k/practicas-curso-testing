@@ -21,7 +21,7 @@ class BookCar {
     public function execute(User $user, int $carId){        
         $car = $this->carFinder->find($carId);
         
-        if($car->isAvailable()){
+        if(!$car->isAvailable()){
             throw new \Exception();
         }
         
