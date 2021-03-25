@@ -10,7 +10,7 @@ use Service\CarFinder;
 use Model\Car;
 use Service\DbConnection;
 use UseCase\CarNotAvailableException;
-use UseCase\CarNotFoundException;
+use Service\CarNotFoundException;
 use UseCase\MinorsCannotBookCarsException;
 
 class BookCarTest extends TestCase
