@@ -1,5 +1,5 @@
 <?php
-namespace UseCase;
+namespace Service;
 
 use Exception;
 

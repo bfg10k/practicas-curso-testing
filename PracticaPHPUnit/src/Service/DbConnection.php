@@ -14,7 +14,7 @@ class DbConnection {
     public function __construct(string $host, string $dbUser, string $dbPass, string $dbName) {
         $this->conn = new mysqli($host, $dbUser, $dbPass, $dbName);
 
-        if ($conn->connect_error) {
+        if ($this->conn->connect_error) {
             throw new NonValidConnectionException();
         }
     }
@@ -35,5 +35,10 @@ class DbConnection {
 
     public function close(): void{
         $this->conn->close();
+    }
+
+    public function query(string $string): array
+    {
+        return [];
     }
 }
