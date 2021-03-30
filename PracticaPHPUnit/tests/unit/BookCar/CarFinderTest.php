@@ -8,10 +8,14 @@ use Service\CarNotFoundException;
 use Service\DbConnection;
 use Service\DbConnectionFailedException;
 
+/**
+ * @coversDefaultClass \Service\CarFinder
+ */
 class CarFinderTest extends TestCase
 {
     /**
      * @test
+     * @covers ::find
      */
     public function shouldReturnACarIfOneIsFound(){
         $dbConnectionStub = $this->createStub(DbConnection::class);
@@ -30,6 +34,7 @@ class CarFinderTest extends TestCase
 
     /**
      * @test
+     * @covers ::find
      */
     public function shouldThrowExceptionWhenCarIsNotFound(){
         $this->expectException(CarNotFoundException::class);
@@ -42,6 +47,10 @@ class CarFinderTest extends TestCase
         $finder->find(1);
     }
 
+    /**
+     * @test
+     * @covers ::find
+     */
     public function shouldThrowExceptionWhenDbConnectionFails(){
         $this->expectException(DbConnectionFailedException::class);
 
