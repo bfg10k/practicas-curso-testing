@@ -3,7 +3,10 @@
 namespace Test\Unit\BookCar;
 
 use PHPUnit\Framework\TestCase;
+use Service\BookingRepository;
 use Service\CarNotFoundException;
+use Service\ConfirmationNotifierInterface;
+use Service\NotificationFailedException;
 use UseCase\BookCar;
 use Model\User;
 use Model\Booking;
@@ -29,10 +32,6 @@ class BookCarTest extends TestCase
             ->willReturn(true);
 
 
-        $dbConnectionStub = $this->createStub(DbConnection::class);
-        $dbConnectionStub->method('insert')
-            ->willReturn(1);
-
         $carStub = $this->createStub(Car::class);
         $carStub->method('isAvailable')
             ->willReturn(true);
@@ -44,7 +43,25 @@ class BookCarTest extends TestCase
                 $carStub
             );
 
-        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionStub);
+        $bookingRepositoryMock = $this->createMock(BookingRepository::class);
+        $bookingRepositoryMock->expects($this->once())
+            ->method('beginTransaction');
+
+        $bookingRepositoryMock->expects($this->once())
+            ->method('commitTransaction');
+
+        $bookingRepositoryMock->expects($this->never())
+            ->method('rollbackTransaction');
+
+        $bookingRepositoryMock->method('bookCar')
+            ->willReturn(new Booking(1, $userStub, $carStub));
+
+
+        $notifierSpy = $this->createMock(ConfirmationNotifierInterface::class);
+        $notifierSpy->expects($this->exactly(1))
+            ->method('send');
+
+        $bookCarUseCase = new BookCar($carFinderStub, $bookingRepositoryMock, $notifierSpy);
         $booking = $bookCarUseCase->execute(
             $userStub,
             1
@@ -60,7 +77,7 @@ class BookCarTest extends TestCase
     {
         $this->expectException(CarNotAvailableException::class);
 
-        $dbConnectionDummy = $this->createStub(DbConnection::class);
+        $bookingRepositoryMock = $this->repositoryMockWithNoCallsToTransactionMethods();
         $userDummy = $this->createStub(User::class);
 
         $carStub = $this->createStub(Car::class);
@@ -71,7 +88,11 @@ class BookCarTest extends TestCase
         $carFinderStub->method('find')
             ->willReturn($carStub);
 
-        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionDummy);
+        $notifierSpy = $this->createMock(ConfirmationNotifierInterface::class);
+        $notifierSpy->expects($this->never())
+            ->method('send');
+
+        $bookCarUseCase = new BookCar($carFinderStub, $bookingRepositoryMock, $notifierSpy);
 
         $bookCarUseCase->execute(
             $userDummy,
@@ -86,7 +107,8 @@ class BookCarTest extends TestCase
     {
         $this->expectException(CarNotFoundException::class);
 
-        $dbConnectionDummy = $this->createStub(DbConnection::class);
+        $bookingRepositoryMock = $this->repositoryMockWithNoCallsToTransactionMethods();
+
         $userDummy = $this->createStub(User::class);
 
         $carFinderStub = $this->createStub(CarFinder::class);
@@ -95,7 +117,11 @@ class BookCarTest extends TestCase
                 new CarNotFoundException()
             );
 
-        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionDummy);
+        $notifierSpy = $this->createMock(ConfirmationNotifierInterface::class);
+        $notifierSpy->expects($this->never())
+            ->method('send');
+
+        $bookCarUseCase = new BookCar($carFinderStub, $bookingRepositoryMock, $notifierSpy);
         $bookCarUseCase->execute(
             $userDummy,
             1
@@ -107,7 +133,9 @@ class BookCarTest extends TestCase
      */
     public function minorsCannotBookAvailableCars(){
         $this->expectException(MinorsCannotBookCarsException::class);
-        $dbConnectionDummy = $this->createStub(DbConnection::class);
+
+        $bookingRepositoryMock = $this->repositoryMockWithNoCallsToTransactionMethods();
+
         $userStub = $this->createStub(User::class);
         $carStub = $this->createStub(Car::class);
         $carFinderStub = $this->createStub(CarFinder::class);
@@ -121,9 +149,62 @@ class BookCarTest extends TestCase
         $carStub->method('isAvailable')
             ->willReturn(true);
 
-        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionDummy);
+        $notifierSpy = $this->createMock(ConfirmationNotifierInterface::class);
+        $notifierSpy->expects($this->never())
+            ->method('send');
+
+        $bookCarUseCase = new BookCar($carFinderStub, $bookingRepositoryMock, $notifierSpy);
 
         $bookCarUseCase->execute($userStub, 1);
     }
 
+    /**
+     * @test
+     */
+    public function rollBackOnNotificationFail(){
+        $this->expectException(NotificationFailedException::class);
+        $carFinderStub = $this->createStub(CarFinder::class);
+        $carStub = $this->createStub(Car::class);
+        $userStub = $this->createStub(User::class);
+        $notifierStub = $this->createStub(ConfirmationNotifierInterface::class);
+        $bookingRepositoryMock = $this->createMock(BookingRepository::class);
+
+
+        $userStub->method('isAnAdult')
+            ->willReturn(true);
+
+        $carFinderStub->method('find')
+            ->willReturn($carStub);
+
+        $carStub->method('getId')
+            ->willReturn(1);
+        $carStub->method('isAvailable')
+            ->willReturn(true);
+
+        $notifierStub->method('send')
+            ->willThrowException(new NotificationFailedException());
+
+        $bookingRepositoryMock->expects($this->once())
+            ->method('beginTransaction');
+        $bookingRepositoryMock->expects($this->never())
+            ->method('commitTransaction');
+        $bookingRepositoryMock->expects($this->once())
+            ->method('rollbackTransaction');
+
+        $bookCar = new BookCar($carFinderStub, $bookingRepositoryMock, $notifierStub);
+        $bookCar->execute($userStub, 1);
+    }
+
+    private function repositoryMockWithNoCallsToTransactionMethods(): BookingRepository
+    {
+        $bookingRepositoryMock = $this->createMock(BookingRepository::class);
+        $bookingRepositoryMock->expects($this->never())
+            ->method('beginTransaction');
+        $bookingRepositoryMock->expects($this->never())
+            ->method('commitTransaction');
+        $bookingRepositoryMock->expects($this->never())
+            ->method('rollbackTransaction');
+
+        return $bookingRepositoryMock;
+    }
 }

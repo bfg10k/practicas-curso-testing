@@ -2,46 +2,56 @@
 
 namespace UseCase;
 
+use Service\BookingRepository;
+use Service\ConfirmationNotifierInterface;
 use Service\DbConnection;
 use Service\CarFinder;
 use Model\User;
 use Model\Car;
 use Model\Booking;
+use Service\InsertException;
+use Service\NotificationFailedException;
 
-class BookCar {
+class BookCar
+{
 
     private CarFinder $carFinder;
-    private DbConnection $dbConnection;
+    private ConfirmationNotifierInterface $notifier;
+    private BookingRepository $bookingRepository;
 
-    public function __construct(CarFinder $carFinder, DbConnection $dbConnection){
+    public function __construct(
+        CarFinder $carFinder,
+        BookingRepository $bookingRepository,
+        ConfirmationNotifierInterface $notifier
+    ) {
         $this->carFinder = $carFinder;
-        $this->dbConnection = $dbConnection;
+        $this->notifier = $notifier;
+        $this->bookingRepository = $bookingRepository;
     }
 
-    public function execute(User $user, int $carId){
+    public function execute(User $user, int $carId)
+    {
         $car = $this->carFinder->find($carId);
 
-        if(!$car->isAvailable()){
+        if (!$car->isAvailable()) {
             throw new CarNotAvailableException();
         }
 
-        if(!$user->isAnAdult()){
+        if (!$user->isAnAdult()) {
             throw new MinorsCannotBookCarsException();
         }
 
-        $booking = $this->bookCar($user, $car);
+        $this->bookingRepository->beginTransaction();
+
+        try {
+            $booking = $this->bookingRepository->bookCar($user, $car);
+            $this->notifier->send($booking);
+            $this->bookingRepository->commitTransaction();
+        } catch (NotificationFailedException | InsertException $exception) {
+            $this->bookingRepository->rollbackTransaction();
+            throw $exception;
+        }
 
         return $booking;
     }
-
-    private function bookCar(User $user, Car $car): Booking {
-        $bookingId = $this->dbConnection->insert(
-            'INSERT INTO bookings (userId, carId) VALUES('.$user->getId().', '.
-            $car->getId().')'
-        );
-
-        return new Booking($bookingId, $user, $car);
-    }
-
-
 }

@@ -10,6 +10,9 @@ use UseCase\RegisterUser;
 
 class RegisterUserTest extends TestCase
 {
+    /**
+
+     */
     public function testValidUserCanBeRegistered(){
         $dbConnection = new DbConnectionInsertionMock();
         $user = (new RegisterUser($dbConnection))->execute(new UserStub(6));

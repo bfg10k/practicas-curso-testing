@@ -9,8 +9,11 @@ class UserTest extends TestCase
 {
     private const LEGAL_AGE_FOR_DRIVING = 18;
     
-    private const MINIMUM_USER_AGE=6; 
+    private const MINIMUM_USER_AGE=6;
 
+    /**
+     *
+     */
     public function testUserIsAnAdultReturnsFalseForMinors(){
         $user = new User(self::LEGAL_AGE_FOR_DRIVING - 1);
         
@@ -21,6 +24,9 @@ class UserTest extends TestCase
         $this->assertFalse($user->isAnAdult());
     }
 
+    /**
+     *
+     */
     public function testIsAnAdultReturnsTrueForPeopleOlderThanThreshold(){
         $user = new User(self::LEGAL_AGE_FOR_DRIVING + 1);
         
@@ -35,16 +41,25 @@ class UserTest extends TestCase
         $this->assertTrue($user->isAnAdult());
     }
 
+    /**
+     *
+     */
     public function testIsAnAdultReturnsTrueForTresshold(){
         $user = new User(self::LEGAL_AGE_FOR_DRIVING);
         $this->assertTrue($user->isAnAdult());
     }
 
+    /**
+     *
+     */
     public function testPassengerUnderMinimumAgeCantBeCreated(){
         $this->expectException(\InvalidArgumentException::class);
         new User(self::MINIMUM_USER_AGE-1);
     }
 
+    /**
+     *
+     */
     public function testPassengerOverMinimumAgeCanBeCreated(){
         $this->assertTrue((new User(self::MINIMUM_USER_AGE+1)) instanceof User);
 
@@ -53,6 +68,9 @@ class UserTest extends TestCase
         $this->assertTrue((new User(self::MINIMUM_USER_AGE+80)) instanceof User);
     }
 
+    /**
+
+     */
     public function testUsersOfMinimumAgeCanBeCreated(){
         $this->assertTrue(
             (new User(self::MINIMUM_USER_AGE)) instanceof User

@@ -42,6 +42,9 @@ class CarFinderTest extends TestCase
         $finder->find(1);
     }
 
+    /**
+     * @test
+     */
     public function shouldThrowExceptionWhenDbConnectionFails(){
         $this->expectException(DbConnectionFailedException::class);
 
