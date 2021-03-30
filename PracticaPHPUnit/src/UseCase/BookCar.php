@@ -20,7 +20,7 @@ class BookCar {
     }
 
     /**
-     * @throws CarNotAvailableException|InsertException|MinorsCannotBookCarsException
+     * @throws CarNotAvailableException|InsertException|MinorsCannotBookCarsException|\Service\CarNotFoundException
      */
     public function execute(User $user, int $carId): Booking
     {
