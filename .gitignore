@@ -56,3 +56,7 @@ PracticaPHPUnit/.phpunit.result.cache
 PracticaPHPUnit/.idea/
 
 .idea/
+
+PracticaPHPUnit/.phpunit.cache/
+
+PracticaPHPUnit/code-coverage/

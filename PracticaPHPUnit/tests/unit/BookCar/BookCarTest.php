@@ -3,7 +3,9 @@
 namespace Test\Unit\BookCar;
 
 use PHPUnit\Framework\TestCase;
+use Service\BookingRepository;
 use Service\CarNotFoundException;
+use Service\ConfirmationNotifierInterface;
 use UseCase\BookCar;
 use Model\User;
 use Model\Booking;
@@ -18,6 +20,7 @@ class BookCarTest extends TestCase
 
     /**
      * @test
+     * @covers
      */
     public function adultsCanBookAvailableCars()
     {
@@ -29,13 +32,11 @@ class BookCarTest extends TestCase
             ->willReturn(true);
 
 
-        $dbConnectionStub = $this->createStub(DbConnection::class);
-        $dbConnectionStub->method('insert')
-            ->willReturn(1);
 
         $carStub = $this->createStub(Car::class);
         $carStub->method('isAvailable')
             ->willReturn(true);
+
 
         $carFinderStub = $this->createStub(CarFinder::class);
 
@@ -44,7 +45,28 @@ class BookCarTest extends TestCase
                 $carStub
             );
 
-        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionStub);
+        $bookingRepositoryMock = $this->createMock(BookingRepository::class);
+        $bookingRepositoryMock
+            ->method('bookCar')
+            ->willReturn(new Booking(1, $userStub, $carStub));
+
+        $bookingRepositoryMock->expects($this->exactly(1))
+            ->method('commitTransaction');
+        $bookingRepositoryMock->expects($this->exactly(1))
+            ->method('beginTransaction');
+        $bookingRepositoryMock->expects($this->exactly(0))
+            ->method('rollBackTransaction');
+
+        $notifierSpy = $this->createMock(ConfirmationNotifierInterface::class);
+        $notifierSpy->expects($this->exactly(1))
+            ->method('send');
+
+        $bookCarUseCase = new BookCar(
+            $carFinderStub,
+            $bookingRepositoryMock,
+            $notifierSpy
+        );
+
         $booking = $bookCarUseCase->execute(
             $userStub,
             1
@@ -55,12 +77,13 @@ class BookCarTest extends TestCase
 
     /**
      * @test
+     * @covers
      */
     public function adultsCantBookUnavailableCars()
     {
         $this->expectException(CarNotAvailableException::class);
 
-        $dbConnectionDummy = $this->createStub(DbConnection::class);
+        $bookingRepositoryDummy = $this->createStub(BookingRepository::class);
         $userDummy = $this->createStub(User::class);
 
         $carStub = $this->createStub(Car::class);
@@ -71,7 +94,11 @@ class BookCarTest extends TestCase
         $carFinderStub->method('find')
             ->willReturn($carStub);
 
-        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionDummy);
+        $notifierSpy = $this->createMock(ConfirmationNotifierInterface::class);
+        $notifierSpy->expects($this->exactly(0))
+            ->method('send');
+
+        $bookCarUseCase = new BookCar($carFinderStub, $bookingRepositoryDummy, $notifierSpy);
 
         $bookCarUseCase->execute(
             $userDummy,
@@ -81,12 +108,13 @@ class BookCarTest extends TestCase
 
     /**
      * @test
+     * @covers
      */
     public function adultsCantBookNonExistentCars()
     {
         $this->expectException(CarNotFoundException::class);
 
-        $dbConnectionDummy = $this->createStub(DbConnection::class);
+        $bookingRepositoryDummy = $this->createStub(BookingRepository::class);
         $userDummy = $this->createStub(User::class);
 
         $carFinderStub = $this->createStub(CarFinder::class);
@@ -95,7 +123,11 @@ class BookCarTest extends TestCase
                 new CarNotFoundException()
             );
 
-        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionDummy);
+        $notifierSpy = $this->createMock(ConfirmationNotifierInterface::class);
+        $notifierSpy->expects($this->exactly(0))
+            ->method('send');
+
+        $bookCarUseCase = new BookCar($carFinderStub, $bookingRepositoryDummy, $notifierSpy);
         $bookCarUseCase->execute(
             $userDummy,
             1
@@ -104,10 +136,12 @@ class BookCarTest extends TestCase
 
     /**
      * @test
+     * @covers
      */
-    public function minorsCannotBookAvailableCars(){
+    public function minorsCannotBookAvailableCars()
+    {
         $this->expectException(MinorsCannotBookCarsException::class);
-        $dbConnectionDummy = $this->createStub(DbConnection::class);
+        $bookingRepositoryDummy = $this->createStub(BookingRepository::class);
         $userStub = $this->createStub(User::class);
         $carStub = $this->createStub(Car::class);
         $carFinderStub = $this->createStub(CarFinder::class);
@@ -121,7 +155,11 @@ class BookCarTest extends TestCase
         $carStub->method('isAvailable')
             ->willReturn(true);
 
-        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionDummy);
+        $notifierSpy = $this->createMock(ConfirmationNotifierInterface::class);
+        $notifierSpy->expects($this->exactly(0))
+            ->method('send');
+
+        $bookCarUseCase = new BookCar($carFinderStub, $bookingRepositoryDummy, $notifierSpy);
 
         $bookCarUseCase->execute($userStub, 1);
     }
