@@ -18,13 +18,17 @@ class BookCar {
         $this->dbConnection = $dbConnection;
     }
 
-    public function execute(User $user, int $carId){        
+    public function execute(User $user, int $carId){
         $car = $this->carFinder->find($carId);
-        
+
         if(!$car->isAvailable()){
-            throw new \Exception();
+            throw new CarNotAvailableException();
         }
-        
+
+        if(!$user->isAnAdult()){
+            throw new MinorsCannotBookCarsException();
+        }
+
         $booking = $this->bookCar($user, $car);
 
         return $booking;
@@ -38,4 +42,6 @@ class BookCar {
 
         return new Booking($bookingId, $user, $car);
     }
+
+
 }

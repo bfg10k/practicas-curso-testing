@@ -13,7 +13,7 @@ class DbConnection {
     public function __construct(string $host, string $dbUser, string $dbPass, string $dbName){
         $this->conn = new \mysqli($host, $dbUser, $dbPass, $dbName);
 
-        if ($conn->connect_error) {
+        if ($this->conn->connect_error) {
             throw new NonValidConnectionException();
         }
     }
@@ -30,6 +30,11 @@ class DbConnection {
         }
 
         return $this->conn->insert_id;
+    }
+
+    /** @throws DbConnectionFailedException */
+    public function query(string $sql): ?array {
+        return [];
     }
 
     public function close(){
