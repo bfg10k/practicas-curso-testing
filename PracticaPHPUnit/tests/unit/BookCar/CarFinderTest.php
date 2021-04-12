@@ -8,8 +8,6 @@ use Service\CarNotFoundException;
 use Service\DbConnection;
 use Service\DbConnectionFailedException;
 
-/**
- */
 class CarFinderTest extends TestCase
 {
     /**
@@ -44,9 +42,6 @@ class CarFinderTest extends TestCase
         $finder->find(1);
     }
 
-    /**
-     * @test
-     */
     public function shouldThrowExceptionWhenDbConnectionFails(){
         $this->expectException(DbConnectionFailedException::class);
 
