@@ -8,6 +8,8 @@ use Service\CarNotFoundException;
 use Service\DbConnection;
 use Service\DbConnectionFailedException;
 
+/**
+ */
 class CarFinderTest extends TestCase
 {
     /**
