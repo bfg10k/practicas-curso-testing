@@ -3,22 +3,24 @@
 namespace Service;
 
 use Model\Car;
+use Service\DbConnection;
 
 class CarFinder
 {
-    private DbConnection $connection;
+    private DbConnection $dbConnection;
 
-    public function __construct(DbConnection $connection)
+    public function __construct(DbConnection $dbConnection)
     {
-        $this->connection = $connection;
+        $this->dbConnection = $dbConnection;
     }
 
-    /**
-     * @throws CarNotFoundException
-     */
+    /** @throws CarNotFoundException|DbConnectionFailedException */
     public function find(int $id): Car
     {
-        $carData = $this->connection->query('SELECT * FROM cars WHERE car.id = ' . $id);
+        $carData = $this->dbConnection->query(
+            'SELECT cars.id, cars.model, cars.fuel FROM cars WHERE car.id = ' . $id
+        );
+
         if (null === $carData) {
             throw new CarNotFoundException();
         }

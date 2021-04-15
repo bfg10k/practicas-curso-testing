@@ -1,9 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Service;
 
-use Exception;
+class NonValidConnectionException extends  \Exception
+{
 
-class NonValidConnectionException extends Exception {
-    
 }

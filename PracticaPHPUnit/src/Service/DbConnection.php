@@ -33,7 +33,12 @@ class DbConnection {
         return $this->conn->insert_id;
     }
 
-    public function close(): void{
+    /** @throws DbConnectionFailedException */
+    public function query(string $sql): ?array {
+        return [];
+    }
+
+    public function close(){
         $this->conn->close();
     }
 
