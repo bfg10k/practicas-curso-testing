@@ -10,29 +10,21 @@ class Car {
 
     private string $fuel;
 
-    public function __construct(int $id, string $model, string $fuel)
+    private bool $available;
+
+    public function __construct(int $id, string $model, string $fuel, bool $available = true)
     {
         $this->id = $id;
         $this->model = $model;
         $this->fuel = $fuel;
+        $this->available = $available;
     }
 
     public function getId(): int {
-
-    public function __construct(int $id, string $model, string $fuel)
-    {
-        $this->id = $id;
-        $this->model = $model;
-        $this->fuel = $fuel;
+        return $this->id;
     }
 
-    public function getId(): int
-    {
-
-    }
-
-    public function isAvailable(): bool
-    {
-
+    public function isAvailable(): bool {
+        return $this->available;
     }
 }

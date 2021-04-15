@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 namespace Service;
 
-use Exception;
 
-class CarNotFoundException extends Exception
+class CarNotFoundException extends \Exception
 {
 }
