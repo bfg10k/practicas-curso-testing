@@ -2,17 +2,16 @@
 
 namespace Service;
 
-use mysqli;
-
 class DbConnection {
-    private mysqli $conn;
+
+    private string $conn;
 
 
     /**
      * @throws NonValidConnectionException
      */
-    public function __construct(string $host, string $dbUser, string $dbPass, string $dbName) {
-        $this->conn = new mysqli($host, $dbUser, $dbPass, $dbName);
+    public function __construct(string $host, string $dbUser, string $dbPass, string $dbName){
+        $this->conn = new \mysqli($host, $dbUser, $dbPass, $dbName);
 
         if ($this->conn->connect_error) {
             throw new NonValidConnectionException();
@@ -40,10 +39,5 @@ class DbConnection {
 
     public function close(){
         $this->conn->close();
-    }
-
-    public function query(string $string): array
-    {
-        return [];
     }
 }

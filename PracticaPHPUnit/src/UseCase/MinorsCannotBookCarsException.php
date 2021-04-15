@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
 namespace UseCase;
 
-use Exception;
 
-class MinorsCannotBookCarsException extends Exception
+class MinorsCannotBookCarsException extends \Exception
 {
+
 }

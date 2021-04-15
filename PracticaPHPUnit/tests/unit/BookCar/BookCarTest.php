@@ -7,15 +7,14 @@ use Service\BookingRepository;
 use Service\CarNotFoundException;
 use Service\ConfirmationNotifierInterface;
 use Service\NotificationFailedException;
+use Test\Unit\Common\Car\CarMother;
+use Test\Unit\Common\User\UserMother;
 use UseCase\BookCar;
 use Model\User;
 use Model\Booking;
 use Service\CarFinder;
 use Model\Car;
 use Service\DbConnection;
-use UseCase\CarNotAvailableException;
-use Service\CarNotFoundException;
-use UseCase\MinorsCannotBookCarsException;
 use UseCase\CarNotAvailableException;
 use UseCase\MinorsCannotBookCarsException;
 
@@ -27,23 +26,15 @@ class BookCarTest extends TestCase
      */
     public function adultsCanBookAvailableCars()
     {
+        $user = UserMother::generateAdult();
 
-        $userStub = $this->createStub(User::class);
-        $userStub->method('getId')
-            ->willReturn(1);
-        $userStub->method('isAnAdult')
-            ->willReturn(true);
-
-
-        $carStub = $this->createStub(Car::class);
-        $carStub->method('isAvailable')
-            ->willReturn(true);
+        $car = CarMother::generateAvailable();
 
         $carFinderStub = $this->createStub(CarFinder::class);
 
         $carFinderStub->method('find')
             ->willReturn(
-                $carStub
+                $car
             );
 
         $bookingRepositoryMock = $this->createMock(BookingRepository::class);
@@ -57,7 +48,7 @@ class BookCarTest extends TestCase
             ->method('rollbackTransaction');
 
         $bookingRepositoryMock->method('bookCar')
-            ->willReturn(new Booking(1, $userStub, $carStub));
+            ->willReturn(new Booking(1, $user, $car));
 
 
         $notifierSpy = $this->createMock(ConfirmationNotifierInterface::class);
@@ -66,7 +57,7 @@ class BookCarTest extends TestCase
 
         $bookCarUseCase = new BookCar($carFinderStub, $bookingRepositoryMock, $notifierSpy);
         $booking = $bookCarUseCase->execute(
-            $userStub,
+            $user,
             1
         );
 
@@ -80,102 +71,14 @@ class BookCarTest extends TestCase
     {
         $this->expectException(CarNotAvailableException::class);
 
-        $userDummy = $this->createStub(User::class);
-
-        $dbConnectionDummy = $this->createStub(DbConnection::class);
-
-
-        $carStub = $this->createStub(Car::class);
-        $carStub->method('isAvailable')
-            ->willReturn(false);
-
-        $carFinderStub = $this->createStub(CarFinder::class);
-
-        $carFinderStub->method('find')
-            ->willReturn(
-                $carStub
-            );
-
-        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionDummy);
-
-        $bookCarUseCase->execute(
-            $userDummy,
-            1
-        );
-
-    }
-
-    /**
-     * @test
-     */
-    public function adultsCantBookNonExistentCars()
-    {
-        $this->expectException(CarNotFoundException::class);
-
-        $userDummy = $this->createStub(User::class);
-        $dbConnectionDummy = $this->createStub(DbConnection::class);
-
-        $carFinderStub = $this->createStub(CarFinder::class);
-        $carFinderStub->method('find')
-            ->willThrowException(
-                new CarNotFoundException()
-            );
-
-        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionDummy);
-
-        $bookCarUseCase->execute(
-            $userDummy,
-            1
-        );
-    }
-
-    /**
-     * @test
-     */
-    public function minorsCannotBookAvailableCars()
-    {
-        $this->expectException(MinorsCannotBookCarsException::class);
-
-        $dbConnectionDummy = $this->createStub(DbConnection::class);
-        $carFinderStub = $this->createStub(CarFinder::class);
-        $userStub = $this->createStub(User::class);
-        $carStub = $this->createStub(Car::class);
-
-        $userStub->method('isAnAdult')
-            ->willReturn(false);
-
-        $carStub->method('isAvailable')
-            ->willReturn(true);
-
-        $carFinderStub->method('find')
-            ->willReturn(
-                $carStub
-            );
-
-        $bookCarUseCase = new BookCar($carFinderStub, $dbConnectionDummy);
-
-        $bookCarUseCase->execute(
-            $userStub,
-            1
-        );
-    }
-    /**
-     * @test
-     */
-    public function adultsCantBookUnavailableCars()
-    {
-        $this->expectException(CarNotAvailableException::class);
-
         $bookingRepositoryMock = $this->repositoryMockWithNoCallsToTransactionMethods();
         $userDummy = $this->createStub(User::class);
 
-        $carStub = $this->createStub(Car::class);
-        $carStub->method('isAvailable')
-            ->willReturn(false);
+        $car = CarMother::generateUnavailable();
 
         $carFinderStub = $this->createStub(CarFinder::class);
         $carFinderStub->method('find')
-            ->willReturn($carStub);
+            ->willReturn($car);
 
         $notifierSpy = $this->createMock(ConfirmationNotifierInterface::class);
         $notifierSpy->expects($this->never())
@@ -226,17 +129,15 @@ class BookCarTest extends TestCase
         $bookingRepositoryMock = $this->repositoryMockWithNoCallsToTransactionMethods();
 
         $userStub = $this->createStub(User::class);
-        $carStub = $this->createStub(Car::class);
+        $availableCar = CarMother::generateAvailable();
+
         $carFinderStub = $this->createStub(CarFinder::class);
 
         $userStub->method('isAnAdult')
             ->willReturn(false);
 
         $carFinderStub->method('find')
-            ->willReturn($carStub);
-
-        $carStub->method('isAvailable')
-            ->willReturn(true);
+            ->willReturn($availableCar);
 
         $notifierSpy = $this->createMock(ConfirmationNotifierInterface::class);
         $notifierSpy->expects($this->never())
@@ -253,7 +154,7 @@ class BookCarTest extends TestCase
     public function rollBackOnNotificationFail(){
         $this->expectException(NotificationFailedException::class);
         $carFinderStub = $this->createStub(CarFinder::class);
-        $carStub = $this->createStub(Car::class);
+        $availableCar = CarMother::generateAvailable();
         $userStub = $this->createStub(User::class);
         $notifierStub = $this->createStub(ConfirmationNotifierInterface::class);
         $bookingRepositoryMock = $this->createMock(BookingRepository::class);
@@ -263,12 +164,7 @@ class BookCarTest extends TestCase
             ->willReturn(true);
 
         $carFinderStub->method('find')
-            ->willReturn($carStub);
-
-        $carStub->method('getId')
-            ->willReturn(1);
-        $carStub->method('isAvailable')
-            ->willReturn(true);
+            ->willReturn($availableCar);
 
         $notifierStub->method('send')
             ->willThrowException(new NotificationFailedException());
