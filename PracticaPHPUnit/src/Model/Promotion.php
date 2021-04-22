@@ -21,18 +21,18 @@ class Promotion
      * @throws NegativeDiscountException
      * @throws ZeroDiscountException
      */
-    public function __construct(DateTime $startDate, DateTime $endDate, int $discount)
+    public function __construct(\DateTimeInterface $startDate, \DateTimeInterface $endDate, int $discount)
     {
         $this->period = new Period($startDate, $endDate);
         $this->discount = new Discount($discount);
     }
 
-    public function startDate(): DateTime
+    public function startDate(): \DateTimeInterface
     {
         return $this->period->startDate();
     }
 
-    public function endDate(): DateTime
+    public function endDate(): \DateTimeInterface
     {
         return $this->period->endDate();
     }
